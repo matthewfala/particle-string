@@ -1,18 +1,30 @@
 // Physics Particle String //
-// constants
-//float relaxDist = 10; // pixels
-float scrWidth = 1000;
-float scrHeight = 600;
+
+// global measurements
+float pixelspermeter = 10;
+float scrWidth = 200; // meters
+float scrHeight = 120; // meters
 float dt = 0.01;
-particle[] neighbors = new particle[10];
+
+
+// constants
+float stringLen; // lenght of chain
+float KString = 10;
+float KAir = .2;
+
+
+
+
+particle[] chain = new particle[25];
 
 void setup() {
   
-  size(1000, 600);
+  size(2000, 1200);
+  stringLen = scrWidth - 20;
   background( 230,230,230);
   
-  for ( int i = 0; i < neighbors.length; i++ ) {
-     neighbors[i] = new particle( float(width) * i/(neighbors.length-1)+ 100, float(height-20), float(height), color(255*i/(neighbors.length-1), 255*i/(neighbors.length-1),color(255*i/(neighbors.length-1)) ));
+  for ( int i = 0; i < chain.length; i++ ) {
+     chain[i] = new particle( stringLen * i/(chain.length-1) + 10, scrHeight - 10, scrHeight, color(0,0,0));
   }
   frameRate(1/dt);
 }
@@ -20,42 +32,55 @@ void setup() {
 particle[] neighborlist1 = new particle[1];
 particle[] neighborlist2 = new particle[2];
 
-void draw() {
+void draw()
+{
+  // clear
   background(230,230,230);
-  neighbors[0].render();
-  for (int i = 1; i<neighbors.length-1; i++) {
-    println("updating particle" + i );
-    neighborlist2[0] = neighbors[i-1];
-    neighborlist2[1] = neighbors[i+1];
-    neighbors[i].update(neighborlist2);
-    neighbors[i].render();
+  
+  // first link
+  chain[0].render();
+  
+  // middle links
+  // for (int i = 1; i<chain.length-1; i++)
+  for (int i = chain.length-2 ; i > 0; i--)
+  {
+    //// println("updating particle" + i );
+    neighborlist2[0] = chain[i-1];
+    neighborlist2[1] = chain[i+1];
+    chain[i].update(neighborlist2);
+    chain[i].render();
   }
-  neighborlist1[0] = neighbors[neighbors.length - 2];
-  //neighbors[(neighbors.length - 1)].update(neighborlist1);
-  neighbors[(neighbors.length - 1)].render();
+  
+  // last link
+  //neighborlist1[0] = chain[chain.length - 2];
+  //chain[(chain.length - 1)].update(neighborlist1);
+  chain[(chain.length - 1)].render();
 }
 
 class particle {
+  
+  // values
   float relaxDist, dist, screenHeight, k, m;
-  PVector v, r, f, displacement, normalDisplacement, tension,vNormalized, airRes, vNormal; 
+  PVector v, r, f, displacement, normalDisplacement, tension,vNormalized, airRes, vNormal;
+  PVector fAir = new PVector(0,0,0);
   color renderColor;
   
+  // initiator
   particle(float x,float y, float tempscreenHeight, color tempRenderColor) {
     v = new PVector(0, 0);
     r = new PVector(x,y);
     f = new PVector(0,0);
     renderColor = tempRenderColor;
-    relaxDist = 0;
-    k = 10;
-    m = .2; // kg
+    relaxDist = stringLen / chain.length;
+    m = .1; // kg
     screenHeight = tempscreenHeight;
-  }  
+  }
+  
+  // draw command
   void render () {
     stroke(255,255,255);
     fill(renderColor);
-    //fill(0,0,0);
-    println( (r.x-5) + "," + (screenHeight - r.y-5) );
-     ellipse(r.x-5, screenHeight - r.y-5, 10, 10);
+    ellipse((r.x-4) * pixelspermeter, (screenHeight - r.y-4) * pixelspermeter, 40, 40);
   }
   
   void update (particle[] neighbors) {
@@ -63,48 +88,39 @@ class particle {
     f.x = 0;
     f.y = 0;
         
-    // gravity
+    // Gravity
     f.add(0, -9.8*m);
     
-    // tensions
-    
-    // add neighbors
-    for (int i=0; i < neighbors.length; i++) {
+    // Neighbors
+    // for (int i=0; i < neighbors.length; i++)
+    for (int i=neighbors.length-1; i > -1; i--)
+    {
       dist = PVector.dist(neighbors[i].r, r);
-      println("distance to neighbor " + i + " :" + dist);
+      
       if (dist > relaxDist) {
         displacement = PVector.sub(neighbors[i].r, r);
         normalDisplacement = displacement;
         normalDisplacement.normalize();
+        tension = PVector.mult( normalDisplacement, (dist - relaxDist) * KString );
         
-        //displacement = PVector.sub(displacement, PVector.mult( normalDisplacement, relaxDist) );
-        displacement = PVector.mult( normalDisplacement, (displacement.mag() - relaxDist) );
-        
-        tension = displacement.mult(k); 
-        println(tension);
+
         f.add(tension);
-        println("tension: " + tension);
       }
       
-      println("Force on particle: " + f);
-           
+      // Air
+      fAir.x = v.x;
+      fAir.y = v.y;
+      fAir.z = v.z;
+      fAir.normalize();
+      fAir.mult(-KAir * v.mag()); 
       
-      // air resistance
-      
-      vNormal = new PVector();
-      vNormal.x = v.x;
-      vNormal.y = v.y;
-      vNormal.z = v.z;
-      
-      vNormal.normalize();
-      airRes = PVector.mult( vNormal, ( -.01 * v.mag() * v.mag()) );
-
-      f.add( new PVector(0,0)); //airRes);
+      f.add(fAir);
+        
+        
+      // Update velocity and postion
 
       v.add(PVector.mult( PVector.div(f, m), dt ));
-      println( "moved from " + r );
       r.add(PVector.mult(v, dt));
-      print( " to " + r );
       
     }
      
