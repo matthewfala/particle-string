@@ -27,9 +27,9 @@ class particle {
   
   // draw command
   void render () {
-    stroke(255,255,255);
+    stroke(0,0,0);
     fill(renderColor);
-    ellipse((r.x-30 / pixelspermeter) * pixelspermeter, (screenHeight - r.y-30/pixelspermeter) * pixelspermeter, 60, 60);
+    ellipse(r.x * pixelspermeter, (screenHeight - r.y )* pixelspermeter, 60, 60);
   }
   
   void update (particle[] neighbors) {
@@ -39,6 +39,7 @@ class particle {
         
     // Gravity
     f.add(0, -9.8*m);
+    
     
     // Neighbors
     for (int i=0; i < neighbors.length; i++)
@@ -52,6 +53,7 @@ class particle {
         f.add(tension);
       }
     }
+    
       
     // Air
     fAir.x = v.x;

@@ -7,19 +7,24 @@
         ////////////////////////////////////////////
         
 // global measurements
-float pixelspermeter = 100;
-float scrWidth = 20; // meters
-float scrHeight = 12; // meters
+float pixelspermeter = 300;
+float scrWidth = 8; // meters
+float scrHeight = 5; // meters
 float dt = 0.01;
+float t = 0;
 
 // chain
-particle[] chain = new particle[40];
+particle[] chain = new particle[10];
+
+// grab
+float threshold = 1;
 
 // constants
-float stringLen = scrHeight ;            // dist between particles
+float stringLen = scrHeight /8;            // dist between particles
 float relaxDist = stringLen / chain.length; // lenght of chain
-float KString = 6;
-float KAir = .4;
+float KString = 5;
+float KAir = .04;
+float KAir2 = .004;
 
 
 // particle assets

@@ -14,7 +14,7 @@ float dt = 0.01;
 float t = 0;
 
 // chain
-particle[] chain = new particle[30];
+particle[] chain = new particle[20];
 
 // constants
 float stringLen = scrWidth /4;            // dist between particles
@@ -23,6 +23,10 @@ float KString = 5;
 float KAir = .04;
 float KAir2 = .004;
 
+// Adjust bar variables
+float watchRange = 5;
+float watchValue = 0;
+PVector watchOffset, ellR, mouseR;
 
 // particle assets
 particle[] neighborlist1 = new particle[1];

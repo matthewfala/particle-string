@@ -9,7 +9,7 @@
 class particle {
   
   // values
-  float dist, screenHeight, k, m;
+  float dist, screenHeight, k, m, fullM;
   PVector v, r, f, displacement, normalDisplacement, tension,vNormalized, airRes, vNormal;
   PVector fAir = new PVector(0,0,0);
   color renderColor;
@@ -19,17 +19,19 @@ class particle {
     v = new PVector(0, 0);
     r = new PVector(x,y);
     f = new PVector(0,0);
+    
     renderColor = tempRenderColor;
     
     m = .01; // kg
+    fullM = m;
     screenHeight = tempscreenHeight;
   }
   
   // draw command
   void render () {
-    stroke(255,255,255);
+    stroke(0,0,0);
     fill(renderColor);
-    ellipse((r.x-30 / pixelspermeter) * pixelspermeter, (screenHeight - r.y-30/pixelspermeter) * pixelspermeter, 60, 60);
+    ellipse(r.x * pixelspermeter, (screenHeight - r.y )* pixelspermeter, .2 * pixelspermeter, .2 * pixelspermeter);
   }
   
   void update (particle[] neighbors) {
@@ -38,7 +40,8 @@ class particle {
     f.y = 0;
         
     // Gravity
-    f.add(0, -9.8*m);
+    f.add(0, -9.8*fullM);
+    
     
     // Neighbors
     for (int i=0; i < neighbors.length; i++)
@@ -52,6 +55,7 @@ class particle {
         f.add(tension);
       }
     }
+    
       
     // Air
     fAir.x = v.x;
@@ -62,8 +66,56 @@ class particle {
     f.add(fAir);
       
     // Update velocity and postion
-    v.add(PVector.mult( PVector.div(f, m), dt ));
+    v.add(PVector.mult( PVector.div(f, fullM), dt ));
     r.add(PVector.mult(v, dt));
       
+  }
+}
+
+class doc {
+  PVector r;
+  PVector v; 
+  PVector f;
+  PVector offset;
+  float m = .5;
+  float radius = .5;
+  int stuck = 100;
+  
+  doc(float x, float y) {
+    r = new PVector(x,y);
+    v = new PVector(0,0);
+    f = new PVector(0,0);
+  }
+  
+  void update() {
+    f = new PVector(0,0);
+    
+    // g
+    f.add(0, m * -9.8);
+    
+    // handel collision
+    if (stuck == 100) {
+      for (int i = 0; i < chain.length; i++ ) {
+        if (r.dist(chain[i].r) < radius) {
+          chain[i].fullM = chain[i].m + m;
+          offset = PVector.sub(r, chain[i].r);
+          stuck = i;
+          chain[stuck].v = v;
+  
+        }
+      } 
+    }
+    
+    if (stuck != 100) {
+      r = PVector.add(chain[stuck].r, offset);
+    }
+    
+    v.add( PVector.mult(PVector.div(f, m), dt));
+    r.add( PVector.mult(v, dt) );
+    
+  } 
+  void render() {
+    image(img, r.x * pixelspermeter, (scrHeight - r.y) * pixelspermeter, .4 * pixelspermeter,.4 * pixelspermeter);
+   // rect(r.x * pixelspermeter, (scrHeight - r.y) * pixelspermeter, 30,30);
   }
 }

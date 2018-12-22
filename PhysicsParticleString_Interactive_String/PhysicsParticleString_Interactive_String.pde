@@ -1,31 +1,57 @@
 // Physics Particle String //
+// by Matthew Fala         //
 
 void setup()
 {
-  size(2000, 1200);
+  size(2400, 1500);
+  stroke(0,0,0);
+  fill(0,0,0);
+  
   background( 230,230,230);
   
   // particles
   for ( int i = 0; i < chain.length; i++ ) 
   {
-     chain[i] = new particle( scrWidth/2, scrHeight -2, scrHeight, color(0,0,0));
+     chain[i] = new particle(  scrWidth/2, scrHeight - 1.5 - 4 * stringLen * i / (chain.length-1), scrHeight, color(0,0,0));
   }
+  //chain[chain.length-1].m = .1;
   
+   PFont bigJohn;
+   bigJohn = loadFont("BigJohn-48.vlw");
+   textFont(bigJohn);
+   textSize(90);
+ 
   // frame
   frameRate(1/dt);
 }
+
+// Adjust bar variables
+float watchRange = 5;
+float watchValue = 0;
+PVector watchOffset, ellR, mouseR;
 
 void draw()
 {
   // clear
   background(230,230,230);
-  
+  stroke(0,0,0);
+  fill(0,0,0);
   rect(10,10, pixelspermeter, pixelspermeter);
+
+  updateMouse();
   updateChain();
   pullChain();
+  textOverlay();
+  
+  // Modifications
+  
+  t = (t + dt );
   
 }
 
+void textOverlay() {
+ text("STRING SIMULATOR",  width/2 - 410, height - 80);
+}
 
 void updateChain()
 {

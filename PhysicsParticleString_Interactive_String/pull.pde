@@ -13,30 +13,13 @@ int mouseStatus = 0;
 //             2 - held
 //             3 - mouse held nothing selected
 
-// constants
+// variables
 float minDist;
-int minI;
-int selectedParticle;
+int minI, selectedParticle;
 PVector offset;
-PVector mousePos = new PVector(0,0,0);
-float threshold = 10;
 
 void pullChain()
 {
-  // Update mouseStatus
-  mousePos.x = mouseX / pixelspermeter;
-  mousePos.y = scrHeight - mouseY / pixelspermeter;
-  
-  println("mouse = " + mousePos );
-  if (mousePressed)
-   {
-     if (mouseStatus == 0) { mouseStatus = 1; }
-     else if (mouseStatus == 1) 
-     {
-       mouseStatus = 2;
-     }
-   }
-   else { mouseStatus = 0; }
    
    // mouse options
    if (mouseStatus == 0) {
@@ -64,6 +47,7 @@ void pullChain()
      }
      else {
        mouseStatus = 3;
+       selectedParticle = 0;
        //print("Particle Not Selected");
      }
    }
