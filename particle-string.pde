@@ -37,7 +37,7 @@ void draw() {
 
 class particle {
   float relaxDist, dist, screenHeight, k, m;
-  PVector v, r, f, displacement, normalDisplacement, tension; 
+  PVector v, r, f, displacement, normalDisplacement, tension,vNormalized; 
   color renderColor;
   
   particle(float x,float y, float tempscreenHeight, color tempRenderColor) {
@@ -46,7 +46,7 @@ class particle {
     f = new PVector(0,0);
     renderColor = tempRenderColor;
     relaxDist = 0;
-    k = 10;
+    k = 4;
     m = .2; // kg
     screenHeight = tempscreenHeight;
   }  
@@ -90,7 +90,9 @@ class particle {
            
       
       // air resistance
-      f.subtract( 
+      vNormalized = v;
+      vNormalized.normalize();
+    //  f.add( vNormalized.mult( -0.00001 * (v.mag())* (v.mag()) ) ) ;
       v.add(PVector.mult( PVector.div(f, m), dt ));
       println( "moved from " + r );
       r.add(PVector.mult(v, dt));
